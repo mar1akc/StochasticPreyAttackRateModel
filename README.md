@@ -1,34 +1,4 @@
 # StochasticPreyAttackRateModel
-This repository contains C and Python code used to generate figures for the research paper 
-*"Stochastic resonance at the Hopf bifurcation of a role-reversal predator–prey model with bounded environmental forcing"* by M. Cameron and D. Levy, arXiv: TBD. The Python code was written with assistance from Claude, version Opus 5 High.
-
-The paper introduces a stage-structured predator-prey model with role reversal, where the prey attack rate is modeled by an exponential Ornstein-Uhlenbeck process.
-
-Figures 2 and 9 were generated using code in the folder Timescales. Run SampleTrajectories.ipynb and timeseries.ipynb, respectively.
-
-Figure 3 was generated using PlotDistributions.ipynb. The data for it, located in the directory "Data", were generated using the C code expOU_simulations.c. To generate data for different values of ALPHA and SIGMA, set the desired values for ALPHA and SIGMA in lines 34 and 35 of expOU_simulations.c. Open Terminal. Compile with {\tt gcc expOUmodel_simulation.c -lm -O3}. Run with {\tt ./a.out}. After the run is completed, rename the file params.txt to params6.txt (or params<any unused nonnegative integer>.txt) to distinguish the new dataset from the ones generated earlier. Then run PlotDistributions.ipynb to create the probability density plot.
-
-Data for Figures 3,4,5,6,7,8 were generated using expOUmodel_mean_covar.c. You need to modify the macros, global variables, and the void driver(int run)  and int main(void) functions with settings appropriate for the task you want to accomplish. Specifically, choose settings in lines 34--39:
-34 // #define ALPHA 0.1 //0.1329 // alpha = 0.1329 is the resonance frequency
-35 // #define VARIANCE 1.25e-3  
-36 #define SIGMA 0.01
-37 
-38 #define Nvals_g 31
-39 #define Nvals_alpha 5
-Adjust the global variable settings in lin line 54: double DELTA, ALPHA; //, SIGMA;
-Create the output directory and modify all file names in driver and main accordingly
-Prescribe the values of the global variables in main() and adjust main() accordingly. 
-If you wish to compute the probability density, set #define NSTEPS 1e10 in line 17. Also, uncomment the bin-writing commands in driver(). It suffices to set #define NSTEPS 1e8 for Figures 6 and 7 and #define NSTEPS 1e9 for Figure 8. 
-The current settings in expOUmodel_mean_covar.c correspond to Figure 8. 
-
-Then the figures are created using the following ipynb files:
-Figures 4 and 5: Data directory: dirname = "ResonanceData_3/“; Code: plot_resonance.ipynb 
-Figure 6: Data directory: dirname = "MeanVarData_v1p25em3/“; Code: Mean_Covar.ipynb
-Figure 7: Data directory: dirname ="MeanVarData_4/"; Code: Mean_Covar.ipynb
-Figure 8: Data directory: dirname = "HopfShiftData_1/"; Code: Mean_Covar.ipynb
-
-
-# StochasticPreyAttackRateModel
 
 C and Python code used to generate the figures for
 
@@ -48,9 +18,9 @@ The Python code was written with assistance from Claude (Opus 5, High).
 |---|---|
 | `Timescales/` | Notebooks for the sample-trajectory and time-series figures |
 | `expOU_simulations.c` | Long simulation → binned joint density of the populations |
-| `expOUmodel_mean_covar.c` | Parameter sweeps → running means and covariances |
+| `expOUmodel_mean_covar.c` | Long simulations with parameter sweeps → running means and covariances |
 | `PlotDistributions.ipynb` | Probability-density plot |
-| `plot_resonance.ipynb` | Resonance curves |
+| `plot_resonance.ipynb` | Probability density plots superimposed with small-noise predictions |
 | `Mean_Covar.ipynb` | Mean and covariance plots |
 | `LieBrackets_symbolic.ipynb` | Symbolic Lie brackets and Hörmander determinant (Section 4.2) |
 | `Data/`, `ResonanceData_3/`, `MeanVarData_*/`, `HopfShiftData_1/` | Precomputed output of the C programs |
