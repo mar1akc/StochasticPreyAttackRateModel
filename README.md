@@ -52,12 +52,13 @@ The Python code was written with assistance from Claude (Opus 5, High).
 | `PlotDistributions.ipynb` | Probability-density plot |
 | `plot_resonance.ipynb` | Resonance curves |
 | `Mean_Covar.ipynb` | Mean and covariance plots |
+| `LieBrackets_symbolic.ipynb` | Symbolic Lie brackets and Hörmander determinant (Section 4.2) |
 | `Data/`, `ResonanceData_3/`, `MeanVarData_*/`, `HopfShiftData_1/` | Precomputed output of the C programs |
 
 ### Requirements
 
 - A C compiler (`gcc` or `clang`) with the standard math library
-- Python 3.9+ with `numpy`, `scipy`, `matplotlib`, and `jupyter`
+- Python 3.9+ with `numpy`, `scipy`, `matplotlib`, `sympy`, and `jupyter`
 
 ---
 
@@ -129,19 +130,22 @@ Then edit the two functions:
 
 - **`main()`** — set the swept values to match the grid you declared above, and update the
   `fopen` calls for `mean_cov.txt` and `mean_cov3.txt`.
-- **`driver()`** — update the `sprintf` file name for `params_run<run>.txt`, and the `printf`
-  and output columns if you changed what is written.
+- **`driver()`** — update the three `sprintf` file names (`bins_...`, `ubins_...`,
+  `params_run<run>.txt`), and the `printf` and output columns if you changed what is written.
 
 All output file names are hard-coded with their directory prefix, so **create the output
 directory yourself before running** and make sure every file name in `main()` and `driver()`
 points at it. The program does not create the directory, and `fopen` failures are not reported —
 if the directory is missing, the run will crash or silently produce nothing.
 
-| Target | `NSTEPS` | Also required |
-|---|---|---|
-| Figures 6, 7 | `1e8` | — |
-| Figure 8 | `1e9` | — |
-| Probability density | `1e10` | Uncomment the bin-writing block in `driver()` |
+| Target | `NSTEPS` |
+|---|---|
+| Figures 6, 7 | `1e8` |
+| Figure 8 | `1e9` |
+| Converged probability densities | `1e10` |
+
+The histograms are written on every run, so `NSTEPS` is what decides whether they are smooth
+enough to plot: `1e9` is adequate for the means and covariances but not for a clean density.
 
 Compile and run:
 
@@ -153,12 +157,43 @@ gcc expOUmodel_mean_covar.c -lm -O3
 
 The run produces, in that directory:
 
-- `mean_cov.txt` — one row per run: `run  alpha  g  mean0  mean1  cov00  cov01  cov11`,
+**Two summary files, appended across the whole sweep**
+
+- `mean_cov.txt` — one row per run:
+  `run  alpha  g  mean0  mean1  cov00  cov01  cov11`,
   for the prey $x$ and the total predator population $y_1 + y_2$
-- `mean_cov3.txt` — the same runs with all three populations resolved separately
-- `params_run<run>.txt` — the parameters and bounding box of each run
+- `mean_cov3.txt` — the same runs with all three populations resolved separately:
+  `run  alpha  g  mean3_0  mean3_1  mean3_2  cov3_00  cov3_01  cov3_02  cov3_11  cov3_12  cov3_22`
+
+**Three files per run**
+
+- `bins_alpha<α>_sigma<σ>_gbar<ḡ>.txt` — the joint histogram of the prey $x$ (rows) against the
+  total predator population $y_1 + y_2$ (columns), `N_BIN` × `N_BIN` tab-separated counts
+- `ubins_alpha<α>_sigma<σ>.txt` — the histogram of the driver $U$, `N_BIN` counts, one per line.
+  There is no $\bar g$ in this name, so a sweep over $\bar g$ overwrites the file — which is
+  harmless, since the law of $U$ does not depend on $\bar g$. You get one file per
+  $(\alpha, \sigma)$ pair.
+- `params_run<run>.txt` — the parameters, `N_BIN`, and the bounding box of the run
+
+The bounding box in `params_run<run>.txt` is what converts bin indices back to population values,
+so keep it with the histograms. `α` and `σ` appear in the file names with three decimals and
+$\bar g$ with four.
 
 Finally, set `dirname` in the relevant notebook to your new directory and run it.
+
+---
+
+## Symbolic verification (Section 4.2)
+
+`LieBrackets_symbolic.ipynb` produces the results of Section 4.2 with SymPy. It computes the
+iterated Lie brackets $L_1 = [b, \sigma]$, $L_2 = [b, L_1]$, $L_3 = [b, L_2]$ of the drift and
+diffusion fields of the augmented four-dimensional system, and factors the determinant of
+$M = [\sigma, L_1, L_2, L_3]$:
+
+$$\det M = D\,\Delta^3 \sigma_U^4\, X^4 Y_1^3 e^{3U} \,( s v_2 - bD - a s X ),$$
+
+which is non-zero at every interior point, so Hörmander's bracket condition holds there. The
+notebook needs no data and runs in seconds.
 
 ---
 
