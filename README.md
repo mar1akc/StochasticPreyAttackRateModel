@@ -2,7 +2,7 @@
 
 C and Python code used to generate the figures for
 
-> **Stochastic resonance at the Hopf bifurcation of a role-reversal predator–prey model with bounded environmental forcing**
+> **Stochastic resonance in a role-reversal predator-prey model**
 > M. Cameron and D. Levy — arXiv: *TBD*
 
 The paper studies a stage-structured predator–prey model with role reversal in which the prey
@@ -172,8 +172,7 @@ notebook needs no data and runs in seconds.
 ```bibtex
 @article{CameronLevy2026,
   author  = {Cameron, M. and Levy, D.},
-  title   = {Stochastic resonance at the {H}opf bifurcation of a role-reversal
-             predator--prey model with bounded environmental forcing},
+  title   = {Stochastic resonance in a role-reversal predator-prey model},
   journal = {arXiv preprint},
   year    = {2026}
 }
